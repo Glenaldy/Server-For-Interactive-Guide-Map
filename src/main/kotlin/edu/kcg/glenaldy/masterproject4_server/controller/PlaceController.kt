@@ -11,15 +11,13 @@ import org.springframework.core.io.InputStreamResource
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.ByteArrayInputStream
 
-@Controller
-@RequestMapping
+
+@RestController
+@CrossOrigin("http://localhost:3000")
 class PlaceController(
         @Autowired val placeRepository: PlaceRepository,
         @Autowired val articleRepository: ArticleRepository,
@@ -37,15 +35,15 @@ class PlaceController(
     @GetMapping("/places")
     @CrossOrigin(origins = ["http://localhost:3000"])
     fun getAllPlace(): ResponseEntity<List<Any>> {
-            val places = placeRepository.findAll()
-            val placeSanitized = mutableListOf<PlaceSanitized>()
+        val places = placeRepository.findAll()
+        val placeSanitized = mutableListOf<PlaceSanitized>()
 
-            places.forEach { place ->
-                val article = place.let { articleRepository.findByPlaceOrNull(it) }
-                placeSanitized.add(PlaceSanitized(place, article))
-            }
+        places.forEach { place ->
+            val article = place.let { articleRepository.findByPlaceOrNull(it) }
+            placeSanitized.add(PlaceSanitized(place, article))
+        }
 
-            return ResponseEntity(placeSanitized, HttpStatus.OK)
+        return ResponseEntity(placeSanitized, HttpStatus.OK)
     }
 
     @GetMapping("/types")
@@ -129,14 +127,23 @@ class PlaceController(
                   @RequestPart("image") image: MultipartFile
     ): ResponseEntity<Any> {
         if (!image.isEmpty) {
-            val image = imageService.saveImage(image.bytes, jsonData)
-            println(image)
+            val savedImage = imageService.saveImage(image.bytes, jsonData)
+            savedImage?.let { println(it.identifier) }
         }
         return ResponseEntity(HttpStatus.OK)
     }
 
+//    @PostMapping("/test")
+//    fun testMultipart(jsonData: ImageSchema, image: MultipartFile
+//    ): ResponseEntity<Any> {
+//        println(jsonData)
+//        println(image.originalFilename)
+//        return ResponseEntity(HttpStatus.OK)
+//    }
+
+
     @GetMapping("/images/{imageIdentifier}")
-    @CrossOrigin(origins = ["http://localhost:3000"])
+    @CrossOrigin
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     fun getImageByPlace(@PathVariable imageIdentifier: String): ResponseEntity<InputStreamResource> {
         val image = imageRepository.findByIdentifierOrNull(imageIdentifier)

@@ -1,6 +1,5 @@
 package edu.kcg.glenaldy.masterproject4_server.config
 
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
@@ -28,13 +27,10 @@ class ApiKeyFilter(private val environment: Environment) : OncePerRequestFilter(
             response: HttpServletResponse,
             filterChain: FilterChain
     ) {
-        val apiKeyHeader = request.getHeader("API-Key")
+        val apiKeyParam = request.getParameter("api_key")
         val apiKeyEnv = environment.getProperty("API_KEY")
-        println("KEY IN ENV: $apiKeyEnv")
-        println("KEY IN header: $apiKeyHeader")
-        if (isValidApiKey(apiKeyHeader, apiKeyEnv)) {
-            println("VALID")
-            val auth = ApiKeyAuthentication(apiKeyHeader)
+        if (isValidApiKey(apiKeyParam, apiKeyEnv)) {
+            val auth = ApiKeyAuthentication(apiKeyParam)
             SecurityContextHolder.getContext().authentication = auth
         }
         filterChain.doFilter(request, response)
@@ -60,11 +56,12 @@ class SecurityConfig(private val environment: Environment) : WebSecurityConfigur
 
     override fun configure(http: HttpSecurity) {
         http
+                .cors().and()
                 .csrf().disable()
                 .addFilterBefore(ApiKeyFilter(environment), BasicAuthenticationFilter::class.java)
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
-                .anyRequest().authenticated() // DELETE
+                .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
     }
