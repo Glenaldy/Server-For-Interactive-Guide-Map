@@ -63,10 +63,7 @@ class SecurityConfig(private val environment: Environment) : WebSecurityConfigur
                 .csrf().disable()
                 .addFilterBefore(ApiKeyFilter(environment), BasicAuthenticationFilter::class.java)
                 .authorizeRequests()
-//                .antMatchers("/places").authenticated()
-//                .antMatchers("/types").authenticated()
-//                .antMatchers("/**").authenticated() // Allow authenticated access to /api/**
-//                .anyRequest().permitAll() // Allow unauthenticated access to other endpoints
+                .antMatchers("/").permitAll()
                 .anyRequest().authenticated() // DELETE
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

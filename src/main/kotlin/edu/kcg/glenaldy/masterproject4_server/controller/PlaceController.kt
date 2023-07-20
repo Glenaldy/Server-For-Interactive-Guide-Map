@@ -27,12 +27,16 @@ class PlaceController(
         @Autowired val imageRepository: ImageRepository,
         @Autowired val imageService: ImageService
 ) {
+
+    @GetMapping("/")
+    @CrossOrigin(origins = ["http://localhost:3000"])
+    fun getHome(): ResponseEntity<String> {
+        return ResponseEntity("Master Project 4 Server by Glenaldy", HttpStatus.OK)
+    }
+
     @GetMapping("/places")
     @CrossOrigin(origins = ["http://localhost:3000"])
     fun getAllPlace(): ResponseEntity<List<Any>> {
-        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
-
-        return if (authentication != null && authentication.isAuthenticated) {
             val places = placeRepository.findAll()
             val placeSanitized = mutableListOf<PlaceSanitized>()
 
@@ -41,11 +45,7 @@ class PlaceController(
                 placeSanitized.add(PlaceSanitized(place, article))
             }
 
-            ResponseEntity(placeSanitized, HttpStatus.OK)
-        } else {
-            println("FORBIDDEN AFTER PASS")
-            ResponseEntity(HttpStatus.UNAUTHORIZED)
-        }
+            return ResponseEntity(placeSanitized, HttpStatus.OK)
     }
 
     @GetMapping("/types")
