@@ -1,0 +1,1 @@
+web: java $JAVA_OPTS -jar build/libs/master-project4_server-0.0.1.war
