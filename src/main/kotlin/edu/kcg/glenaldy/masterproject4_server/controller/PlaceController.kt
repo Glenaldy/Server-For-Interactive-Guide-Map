@@ -17,7 +17,7 @@ import java.io.ByteArrayInputStream
 
 
 @RestController
-@CrossOrigin("http://localhost:3000")
+@CrossOrigin(origins = ["http://localhost:3000", "https://interactive-guide-map-587206baba62.herokuapp.com/"])
 class PlaceController(
         @Autowired val placeRepository: PlaceRepository,
         @Autowired val articleRepository: ArticleRepository,
@@ -27,13 +27,13 @@ class PlaceController(
 ) {
 
     @GetMapping("/")
-    @CrossOrigin(origins = ["http://localhost:3000"])
+    @CrossOrigin
     fun getHome(): ResponseEntity<String> {
         return ResponseEntity("Master Project 4 Server by Glenaldy", HttpStatus.OK)
     }
 
     @GetMapping("/places")
-    @CrossOrigin(origins = ["http://localhost:3000"])
+    @CrossOrigin
     fun getAllPlace(): ResponseEntity<List<Any>> {
         val places = placeRepository.findAll()
         val placeSanitized = mutableListOf<PlaceSanitized>()
@@ -47,7 +47,7 @@ class PlaceController(
     }
 
     @GetMapping("/types")
-    @CrossOrigin(origins = ["http://localhost:3000"])
+    @CrossOrigin
     fun getAllType(): ResponseEntity<List<Any>> {
         val types = placeTypeRepository.findAll()
         val places = placeRepository.findAll()
@@ -61,7 +61,7 @@ class PlaceController(
     }
 
     @GetMapping("/articles")
-    @CrossOrigin(origins = ["http://localhost:3000"])
+    @CrossOrigin
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     fun getAllArticle(): ResponseEntity<List<Any>> {
         val articles = articleRepository.findAll()
@@ -132,15 +132,6 @@ class PlaceController(
         }
         return ResponseEntity(HttpStatus.OK)
     }
-
-//    @PostMapping("/test")
-//    fun testMultipart(jsonData: ImageSchema, image: MultipartFile
-//    ): ResponseEntity<Any> {
-//        println(jsonData)
-//        println(image.originalFilename)
-//        return ResponseEntity(HttpStatus.OK)
-//    }
-
 
     @GetMapping("/images/{imageIdentifier}")
     @CrossOrigin
