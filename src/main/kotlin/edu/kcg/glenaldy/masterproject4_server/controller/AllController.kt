@@ -18,7 +18,7 @@ import java.io.ByteArrayInputStream
 
 @RestController
 @CrossOrigin(origins = ["http://localhost:3000", "https://interactive-guide-map-587206baba62.herokuapp.com/"])
-class PlaceController(
+class AllController(
         @Autowired val placeRepository: PlaceRepository,
         @Autowired val articleRepository: ArticleRepository,
         @Autowired val placeTypeRepository: PlaceTypeRepository,
@@ -129,6 +129,27 @@ class PlaceController(
         if (!image.isEmpty) {
             val savedImage = imageService.saveImage(image.bytes, jsonData)
             savedImage?.let { println(it.identifier) }
+        }
+        return ResponseEntity(HttpStatus.OK)
+    }
+
+    @PostMapping("/images-json-data", consumes = [MediaType.APPLICATION_JSON_VALUE])
+    fun postImageJSON(@RequestBody jsonData: List<ImageSchema>): ResponseEntity<Any> {
+        jsonData.forEach { jsonItem ->
+            val imageNull = ByteArray(0)
+            val savedImage = imageService.saveImage(imageNull, jsonItem)
+            savedImage?.let { println(it.identifier) }
+        }
+        return ResponseEntity(HttpStatus.OK)
+    }
+
+    @PostMapping("/images-data")
+    fun postImageMultiple(@RequestPart images: List<MultipartFile>): ResponseEntity<Any> {
+        images.forEach { image ->
+            if (!image.isEmpty) {
+                val identifier = image.originalFilename?.substringBeforeLast(".") ?: ""
+                imageService.updateImage(image.bytes, identifier)
+            }
         }
         return ResponseEntity(HttpStatus.OK)
     }

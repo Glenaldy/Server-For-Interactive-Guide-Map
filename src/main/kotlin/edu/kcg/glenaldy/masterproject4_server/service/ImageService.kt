@@ -29,4 +29,12 @@ class ImageService(
         }
         return null
     }
+    @Transactional
+    fun updateImage(imageData: ByteArray, imageIdentifier: String) {
+        val storedImage = imageRepository.findByIdentifierOrNull(imageIdentifier)
+        if (storedImage != null) {
+            storedImage.image = imageData
+            imageRepository.save(storedImage)
+        }
+    }
 }
